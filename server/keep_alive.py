@@ -14,12 +14,19 @@ async def run_web_server():
     app.router.add_get("/health", health_check)
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, "0.0.0.0", 10000)
+
+    # استفاده از PORT که Render تنظیم می‌کند
+    port = int(os.getenv("PORT", 10000))
+    site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
-    logger.info("🌐 Web server started on port 10000")
+    logger.info(f"🌐 Web server started on port {port}")
 
 async def keep_alive_ping():
-    url = os.getenv("RENDER_EXTERNAL_URL") or "https://your-app-name.onrender.com"
+    url = os.getenv("RENDER_EXTERNAL_URL")
+    if not url:
+        logger.warning("RENDER_EXTERNAL_URL not set. Skipping keep-alive ping.")
+        return
+
     health_url = f"{url}/health"
     while True:
         try:
@@ -28,4 +35,4 @@ async def keep_alive_ping():
                     logger.info(f"✅ Keep-alive ping sent: {resp.status}")
         except Exception as e:
             logger.warning(f"⚠️ Keep-alive ping failed: {e}")
-        await asyncio.sleep(300)
+        await asyncio.sleep(450)
