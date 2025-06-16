@@ -96,6 +96,6 @@ def setup_upload_handlers(app):
                 handle_file
             )],
         },
-        fallbacks=[MessageHandler(filters.Regex(\"^/پایان$\"), finish_upload)]
+        fallbacks=[MessageHandler(filters.Regex("^/پایان$"), finish_upload)]
     )
     app.add_handler(conv)
